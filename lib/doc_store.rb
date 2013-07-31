@@ -6,12 +6,16 @@ module DocStore
   end
 
   class File
-    attr_accessor :id, :email, :service_id
+    attr_accessor :id, :email, :service_id, :file
 
     def initialize(hsh = {})
       @id = hsh[:id]
       @email = hsh[:email]
       @service_id = hsh[:service_id]
+    end
+
+    def save(data)
+      true
     end
 
     def data
