@@ -34,7 +34,7 @@ module DocStore
       if store.exists(id)
         store.get(id)
       else
-        raise StoreError, "#{id} could not be found"
+        nil
       end
     end
 

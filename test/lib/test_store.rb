@@ -30,4 +30,45 @@ describe DocStore::Store do
   it "must be able to write" do
     subject.set(SecureRandom.hex, Faker::Lorem.paragraph).must_be :==, true
   end
+
+  describe "the key doesn't exist yet" do
+    it "must return nil on get" do
+      subject.get(@key).must_be :==, nil
+    end
+
+    it "must return true on delete" do
+      subject.destroy(@key).must_be :==, false
+    end
+  end
+
+  describe "actions after writing" do
+    before do
+      @key = SecureRandom.hex
+      @value = Faker::Lorem.paragraph
+      subject.set(@key, @value)
+    end
+
+    it "must be able to get" do
+      subject.get(@key).must_be :==, @value
+    end
+
+    it "must be able to delete" do
+      subject.destroy(@key).must_be :==, true
+    end
+
+    describe "actions after deleting" do
+      before do
+        subject.destroy(@key)
+      end
+
+      it "must return nil on get" do
+        subject.get(@key).must_be :==, nil
+      end
+    end
+
+    after do
+      subject.destroy(@key)
+    end
+
+  end
 end
