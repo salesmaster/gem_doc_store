@@ -19,8 +19,27 @@ describe DocStore::File do
     subject.must_respond_to :save
   end
 
+  it "must be able to save_file" do
+    subject.must_respond_to :save_file
+  end
+
   it "must have a DocStore::Store store" do
     subject.send(:store).must_be_instance_of DocStore::Store
+  end
+
+  describe "saving meta data" do
+    before do
+      @id = SecureRandom.hex
+      @email = Faker::Internet.email
+      subject.save
+    end
+
+    subject { DocStore::File.new(id: @id,
+      email: @email, service_id: SecureRandom.hex) }
+
+    it "must save data as json" do
+      subject.send(:store).get(@id).must_be :==, ({:id => @id, :email => @email}.to_json)
+    end
   end
 
   describe "saving a file" do
@@ -36,12 +55,12 @@ describe DocStore::File do
     end
 
     it "must respond with true" do
-      subject.save(File.open(@file_name)).must_be :==, true
+      subject.save_file(File.open(@file_name)).must_be :==, true
     end
     
     describe "checking save consequences" do
       before do
-        subject.save(File.open(@file_name))
+        subject.save_file(File.open(@file_name))
       end
 
       it "should have something in the file" do

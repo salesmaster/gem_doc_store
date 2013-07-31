@@ -14,12 +14,16 @@ module DocStore
       @service_id = hsh[:service_id]
     end
 
-    def save(data)
-      store.set(id, data.read)
+    def save
+      store.set(id, {:id => id, :email => email}.to_json)
+    end
+
+    def save_file(data)
+      store.set(id + "_data", data.read)
     end
 
     def file
-      store.get(id)
+      store.get(id + "_data")
     end
 
     private
