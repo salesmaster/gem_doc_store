@@ -43,7 +43,8 @@ module DocStore
       return false
     end
 
-    def expire(id)
+    def expire(id, delay = 1)
+      store.expire(id, delay)
     end
 
   end

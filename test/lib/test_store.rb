@@ -39,6 +39,10 @@ describe DocStore::Store do
     it "must return true on delete" do
       subject.destroy(@key).must_be :==, false
     end
+
+    it "must return false on expire" do
+      subject.expire(@key).must_be :==, nil
+    end
   end
 
   describe "actions after writing" do
@@ -56,6 +60,21 @@ describe DocStore::Store do
       subject.destroy(@key).must_be :==, true
     end
 
+    it "must be able to expire" do
+      subject.expire(@key).must_be :==, true
+    end
+
+    describe "actions after expiring" do
+      before do
+        subject.expire(@key)
+        sleep 1
+      end
+
+      it "must have expired the key" do
+        subject.get(@key).must_be :==, nil
+      end
+    end
+
     describe "actions after deleting" do
       before do
         subject.destroy(@key)
@@ -69,6 +88,5 @@ describe DocStore::Store do
     after do
       subject.destroy(@key)
     end
-
   end
 end
