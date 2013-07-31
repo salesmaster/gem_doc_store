@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["riboulet@gmail.com"]
   gem.description   = %q{a simple doc store provider. 
     DocStore object are created with or without content and stored in a
-    memcached server.}
+    redis server.}
   gem.summary       = %q{a simple doc store provider}
   gem.homepage      = ""
 
@@ -20,4 +20,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = DocStore::VERSION
   gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'faker'
+  gem.add_development_dependency 'fakeredis'
+  gem.add_dependency('redis', '>= 3.0.4')
 end

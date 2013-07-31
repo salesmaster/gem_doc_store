@@ -15,4 +15,8 @@ describe DocStore::File do
     subject.must_respond_to :service_id
   end
 
+  it "must have data" do
+    subject.must_respond_to :data
+  end
+
 end
