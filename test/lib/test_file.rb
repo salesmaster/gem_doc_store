@@ -15,12 +15,12 @@ describe DocStore::File do
     subject.must_respond_to :service_id
   end
 
-  it "must have data" do
-    subject.must_respond_to :data
-  end
-
   it "must be able to save" do
     subject.must_respond_to :save
+  end
+
+  it "must have a DocStore::Store store" do
+    subject.send(:store).must_be_instance_of DocStore::Store
   end
 
   describe "saving a file" do
@@ -37,6 +37,24 @@ describe DocStore::File do
 
     it "must respond with true" do
       subject.save(File.open(@file_name)).must_be :==, true
+    end
+    
+    describe "checking save consequences" do
+      before do
+        subject.save(File.open(@file_name))
+      end
+
+      it "should have something in the file" do
+        subject.file.must_be :!=, nil
+      end
+
+      it "should have the proper content" do
+        subject.file.must_be :==, IO.read(@file_name)
+      end
+
+      after do
+        subject.send(:store).destroy(subject.id)
+      end
     end
 
     after do

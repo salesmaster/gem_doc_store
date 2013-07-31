@@ -6,7 +6,7 @@ module DocStore
   end
 
   class File
-    attr_accessor :id, :email, :service_id, :file
+    attr_accessor :id, :email, :service_id
 
     def initialize(hsh = {})
       @id = hsh[:id]
@@ -15,16 +15,20 @@ module DocStore
     end
 
     def save(data)
-      true
+      store.set(id, data.read)
     end
 
-    def data
-      true
+    def file
+      store.get(id)
+    end
+
+    private
+    def store
+      @store = DocStore::Store.new
     end
   end
 
   class Store
-
     def store
       @store ||= Redis.new(:host => ENV['REDIS_HOST'] || "localhost",
         :port => ENV['REDIS_PORT'] || 6380)
