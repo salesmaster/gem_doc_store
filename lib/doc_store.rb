@@ -15,7 +15,8 @@ module DocStore
     end
 
     def save
-      store.set(id, {:id => id, :email => email}.to_json)
+      store.set(id, {:id => id, :email => email,
+        :service_id => service_id}.to_json)
     end
 
     def save_file(data)
@@ -26,9 +27,15 @@ module DocStore
       store.get(id + "_data")
     end
 
+    def self.load(l_id)
+      string = DocStore::Store.new.get(l_id)
+      hash = JSON.parse(string)
+      DocStore::File.new(hash)
+    end
+
     private
     def store
-      @store = DocStore::Store.new
+      @store ||= DocStore::Store.new
     end
   end
 

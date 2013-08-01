@@ -31,14 +31,43 @@ describe DocStore::File do
     before do
       @id = SecureRandom.hex
       @email = Faker::Internet.email
+      @service_id = SecureRandom.hex
+      @meta_hash = {:id => @id, :email => @email, :service_id => @service_id}
       subject.save
     end
 
-    subject { DocStore::File.new(id: @id,
-      email: @email, service_id: SecureRandom.hex) }
+    subject { DocStore::File.new(@meta_hash) }
+
+    it "must be save as not nil" do
+      subject.send(:store).get(@id).must_be :!=, nil
+    end
 
     it "must save data as json" do
-      subject.send(:store).get(@id).must_be :==, ({:id => @id, :email => @email}.to_json)
+      subject.send(:store).get(@id).must_be :==, @meta_hash.to_json
+    end
+
+    describe "loading from id" do
+      before do
+        @first_file = DocStore::File.new(@meta_hash)
+        @first_file.save
+        @reloaded = DocStore::File.load(@id)
+      end
+
+      it "must be save as not nil" do
+        @first_file.send(:store).get(@id).must_be :!=, nil
+      end
+
+      it "must have been stored" do
+        DocStore::File.store.get(@id).must_be :!=, nil
+      end
+
+      it "must contain the correct data" do
+        @first_file.send(:store).get(@id).must_be :==, @meta_hash.to_json
+      end
+
+      it "must have be a DocStore::File" do
+        @reloaded.must_be_instance_of DocStore::File
+      end
     end
   end
 
