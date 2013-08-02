@@ -1,6 +1,12 @@
 require_relative '../test_helper'
 
 describe DocStore::File do
+  let(:id) { SecureRandom.hex }
+  let(:email) { Faker::Internet.email }
+  let(:service_id) { SecureRandom.hex }
+  let(:meta_hash) { {:id => id, :email => email, :service_id => service_id} }
+  let(:file_name) { "/tmp/" + Faker::Lorem.words(1).join(' ') + ".txt" }
+
   subject { DocStore::File.new }
 
   it "must have an id" do
@@ -29,36 +35,32 @@ describe DocStore::File do
 
   describe "saving meta data" do
     before do
-      @id = SecureRandom.hex
-      @email = Faker::Internet.email
-      @service_id = SecureRandom.hex
-      @meta_hash = {:id => @id, :email => @email, :service_id => @service_id}
       subject.save
     end
 
-    subject { DocStore::File.new(@meta_hash) }
+    subject { DocStore::File.new(meta_hash) }
 
     it "must be save as not nil" do
-      subject.send(:store).get(@id).must_be :!=, nil
+      subject.send(:store).get(id).must_be :!=, nil
     end
 
     it "must save data as json" do
-      subject.send(:store).get(@id).must_be :==, @meta_hash.to_json
+      subject.send(:store).get(id).must_be :==, meta_hash.to_json
     end
 
     describe "loading from id" do
       before do
-        @first_file = DocStore::File.new(@meta_hash)
+        @first_file = DocStore::File.new(meta_hash)
         @first_file.save
-        @reloaded = DocStore::File.load(@id)
+        @reloaded = DocStore::File.load(id)
       end
 
       it "must be save as not nil" do
-        @first_file.send(:store).get(@id).must_be :!=, nil
+        @first_file.send(:store).get(id).must_be :!=, nil
       end
 
       it "must contain the correct data" do
-        @first_file.send(:store).get(@id).must_be :==, @meta_hash.to_json
+        @first_file.send(:store).get(id).must_be :==, meta_hash.to_json
       end
 
       it "must have be a DocStore::File" do
@@ -66,30 +68,29 @@ describe DocStore::File do
       end
 
       it "must be the file we save" do
-        @reloaded.id.must_be :==, @id
+        @reloaded.id.must_be :==, id
       end
     end
   end
 
   describe "saving a file" do
 
-    subject { DocStore::File.new(id: SecureRandom.hex,
-      email: Faker::Internet.email, service_id: SecureRandom.hex) }
+    subject { DocStore::File.new(meta_hash) }
 
     before do
-      @file_name = "/tmp/" + Faker::Lorem.words(1).join(' ') + ".txt"
-      File.open(@file_name, "w") do |f|
+      File.open(file_name, "w") do |f|
         f.write Faker::Lorem.paragraphs
       end
     end
 
     it "must respond with true" do
-      subject.save_file(File.open(@file_name)).must_be :==, true
+      subject.save_file(File.open(file_name)).must_be :==, true
     end
     
     describe "checking save consequences" do
       before do
-        subject.save_file(File.open(@file_name))
+        subject.save
+        subject.save_file(File.open(file_name))
       end
 
       it "should have something in the file" do
@@ -97,16 +98,27 @@ describe DocStore::File do
       end
 
       it "should have the proper content" do
-        subject.file.must_be :==, IO.read(@file_name)
+        subject.file.must_be :==, IO.read(file_name)
+      end
+
+      describe "loading from id" do
+        before do
+          @reloaded = DocStore::File.load(id)
+        end
+
+        it "should have the propre file content" do
+          @reloaded.file.must_be :==, IO.read(file_name)
+        end
       end
 
       after do
         subject.send(:store).destroy(subject.id)
       end
+
     end
 
     after do
-      File.delete(@file_name)
+      File.delete(file_name)
     end
   end
 
