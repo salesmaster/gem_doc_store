@@ -9,9 +9,9 @@ module DocStore
     attr_accessor :id, :email, :service_id
 
     def initialize(hsh = {})
-      @id = hsh[:id]
-      @email = hsh[:email]
-      @service_id = hsh[:service_id]
+      @id = hsh[:id] || hsh['id']
+      @email = hsh[:email] || hsh['email']
+      @service_id = hsh[:service_id] || hsh['service_id']
     end
 
     def save
@@ -29,8 +29,7 @@ module DocStore
 
     def self.load(l_id)
       string = DocStore::Store.new.get(l_id)
-      hash = JSON.parse(string)
-      DocStore::File.new(hash)
+      DocStore::File.new(JSON.parse(string))
     end
 
     private

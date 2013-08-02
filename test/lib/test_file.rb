@@ -57,16 +57,16 @@ describe DocStore::File do
         @first_file.send(:store).get(@id).must_be :!=, nil
       end
 
-      it "must have been stored" do
-        DocStore::File.store.get(@id).must_be :!=, nil
-      end
-
       it "must contain the correct data" do
         @first_file.send(:store).get(@id).must_be :==, @meta_hash.to_json
       end
 
       it "must have be a DocStore::File" do
         @reloaded.must_be_instance_of DocStore::File
+      end
+
+      it "must be the file we save" do
+        @reloaded.id.must_be :==, @id
       end
     end
   end
