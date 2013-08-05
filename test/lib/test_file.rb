@@ -48,6 +48,14 @@ describe DocStore::File do
       subject.send(:store).get(id).must_be :==, meta_hash.to_json
     end
 
+    describe "loading an incorrect id" do
+      it "should return a DocStore::RecordNotFound exception" do
+        proc do
+          DocStore::File.load(SecureRandom.hex)
+        end.must_raise DocStore::RecordNotFound
+      end
+    end
+
     describe "loading from id" do
       before do
         @first_file = DocStore::File.new(meta_hash)

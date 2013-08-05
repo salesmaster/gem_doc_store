@@ -5,6 +5,9 @@ module DocStore
   class StoreError < StandardError  
   end
 
+  class RecordNotFound < StandardError
+  end
+
   class File
     attr_accessor :id, :email, :service_id
 
@@ -29,7 +32,11 @@ module DocStore
 
     def self.load(l_id)
       string = DocStore::Store.new.get(l_id)
-      DocStore::File.new(JSON.parse(string))
+      if string.nil?
+        raise DocStore::RecordNotFound, "#{l_id} file was not found"
+      else
+        DocStore::File.new(JSON.parse(string))
+      end
     end
 
     private
