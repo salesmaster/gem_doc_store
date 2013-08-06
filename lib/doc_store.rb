@@ -9,17 +9,23 @@ module DocStore
   end
 
   class File
-    attr_accessor :id, :email, :service_id
+    attr_accessor :id, :email, :filename, :format, :service_id
 
     def initialize(hsh = {})
       @id = hsh[:id] || hsh['id']
       @email = hsh[:email] || hsh['email']
       @service_id = hsh[:service_id] || hsh['service_id']
+      @format = hsh[:format] || hsh['format']
+      @filename = hsh[:filename] || hsh['filename']
+    end
+
+    def to_h
+      {id: id, email: email, filename: filename, format: format,
+        service_id: service_id}
     end
 
     def save
-      store.set(id, {:id => id, :email => email,
-        :service_id => service_id}.to_json)
+      store.set(id, self.to_h.to_json)
     end
 
     def save_file(data)

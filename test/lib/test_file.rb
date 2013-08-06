@@ -4,8 +4,12 @@ describe DocStore::File do
   let(:id) { SecureRandom.hex }
   let(:email) { Faker::Internet.email }
   let(:service_id) { SecureRandom.hex }
-  let(:meta_hash) { {:id => id, :email => email, :service_id => service_id} }
-  let(:file_name) { "/tmp/" + Faker::Lorem.words(1).join(' ') + ".txt" }
+  let(:filename) { Faker::Lorem.words(1).join(' ') + ".txt" }
+  let(:meta_hash) do
+    {:id => id, :email => email, :filename => filename, :format => 'pdf',
+      :service_id => service_id}
+  end
+  let(:file_path) { "/tmp/" + filename }
 
   subject { DocStore::File.new }
 
@@ -15,6 +19,14 @@ describe DocStore::File do
 
   it "must have an email" do
     subject.must_respond_to :email
+  end
+
+  it "must have a filename" do
+    subject.must_respond_to :filename
+  end
+
+  it "must have a format" do
+    subject.must_respond_to :format
   end
 
   it "must have a service id" do
@@ -29,8 +41,16 @@ describe DocStore::File do
     subject.must_respond_to :save_file
   end
 
+  it "must have a to_h method" do
+    subject.must_respond_to :to_h
+  end
+
   it "must have a DocStore::Store store" do
     subject.send(:store).must_be_instance_of DocStore::Store
+  end
+
+  it "must return a proper hash" do
+    subject.to_h.keys.must_be :==, [:id, :email, :filename, :format, :service_id]
   end
 
   describe "saving meta data" do
@@ -86,19 +106,19 @@ describe DocStore::File do
     subject { DocStore::File.new(meta_hash) }
 
     before do
-      File.open(file_name, "w") do |f|
+      File.open(file_path, "w") do |f|
         f.write Faker::Lorem.paragraphs
       end
     end
 
     it "must respond with true" do
-      subject.save_file(File.open(file_name)).must_be :==, true
+      subject.save_file(File.open(file_path)).must_be :==, true
     end
     
     describe "checking save consequences" do
       before do
         subject.save
-        subject.save_file(File.open(file_name))
+        subject.save_file(File.open(file_path))
       end
 
       it "should have something in the file" do
@@ -106,7 +126,7 @@ describe DocStore::File do
       end
 
       it "should have the proper content" do
-        subject.file.must_be :==, IO.read(file_name)
+        subject.file.must_be :==, IO.read(file_path)
       end
 
       describe "loading from id" do
@@ -115,7 +135,7 @@ describe DocStore::File do
         end
 
         it "should have the propre file content" do
-          @reloaded.file.must_be :==, IO.read(file_name)
+          @reloaded.file.must_be :==, IO.read(file_path)
         end
       end
 
@@ -126,7 +146,7 @@ describe DocStore::File do
     end
 
     after do
-      File.delete(file_name)
+      File.delete(file_path)
     end
   end
 
