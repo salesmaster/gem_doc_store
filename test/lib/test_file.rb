@@ -37,6 +37,14 @@ describe DocStore::File do
     subject.must_respond_to :save
   end
 
+  it "must be able to destroy" do
+    subject.must_respond_to :destroy
+  end
+
+  it "must be able to expire" do
+    subject.must_respond_to :expire
+  end
+
   it "must be able to save_file" do
     subject.must_respond_to :save_file
   end
@@ -143,6 +151,32 @@ describe DocStore::File do
         subject.send(:store).destroy(subject.id)
       end
 
+    end
+
+    describe "checking expire consequences" do
+      before do
+        subject.save
+        subject.save_file(File.open(file_path))
+        subject.expire(2)
+      end
+
+      it "should have expired the object" do
+        DocStore::File.load(id).must_be_instance_of DocStore::File
+        sleep 2
+        proc { DocStore::File.load(id) }.must_raise DocStore::RecordNotFound
+      end
+    end
+
+    describe "checking destroy consequences" do
+      before do
+        subject.save
+        subject.save_file(File.open(file_path))
+        subject.destroy
+      end
+
+      it "should have destroyed the object" do
+        proc { DocStore::File.load(id) }.must_raise DocStore::RecordNotFound
+      end
     end
 
     after do

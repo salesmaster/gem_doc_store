@@ -24,6 +24,16 @@ module DocStore
         service_id: service_id}
     end
 
+    def destroy
+      store.destroy(id)
+      store.destroy(id + "_data")
+    end
+
+    def expire(delay = 1)
+      store.expire(id, delay)
+      store.expire(id + "_data", delay)
+    end
+
     def save
       store.set(id, self.to_h.to_json)
     end
