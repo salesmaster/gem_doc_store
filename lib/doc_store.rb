@@ -63,8 +63,8 @@ module DocStore
 
   class Store
     def store
-      @store ||= Redis.new(:host => ENV['REDIS_HOST'] || "localhost",
-        :port => ENV['REDIS_PORT'] || 6379)
+      @store ||= Redis.new host: redis_host,
+                           port: redis_port
     end
 
     def set(id, data)
@@ -88,5 +88,14 @@ module DocStore
       store.expire(id, delay)
     end
 
+    private
+
+    def redis_host
+      ENV['DOCSTORE_REDIS_HOST'] || ENV['REDIS_HOST'] || 'localhost'
+    end
+
+    def redis_port
+      ENV['DOCSTORE_REDIS_PORT'] || ENV['REDIS_PORT'] || 6379
+    end
   end
 end
