@@ -62,9 +62,11 @@ module DocStore
   end
 
   class Store
-    def store
-      @store ||= Redis.new host: redis_host,
-                           port: redis_port
+    attr_reader :store
+
+    def initialize
+      @store = Redis.new host: redis_host,
+                         port: redis_port
     end
 
     def set(id, data)
