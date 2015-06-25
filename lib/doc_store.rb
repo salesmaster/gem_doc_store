@@ -67,6 +67,7 @@ module DocStore
     def initialize
       @store = Redis.new host: redis_host,
                          port: redis_port
+      @store = Redis.new url: ENV['DOCSTORE_REDIS_URL'] if ENV['DOCSTORE_REDIS_URL']
     end
 
     def set(id, data)
@@ -93,11 +94,11 @@ module DocStore
     private
 
     def redis_host
-      ENV['DOCSTORE_REDIS_HOST'] || ENV['REDIS_HOST'] || 'localhost'
+      ENV['REDIS_HOST'] || 'localhost'
     end
 
     def redis_port
-      ENV['DOCSTORE_REDIS_PORT'] || ENV['REDIS_PORT'] || 6379
+      ENV['REDIS_PORT'] || 6379
     end
   end
 end
